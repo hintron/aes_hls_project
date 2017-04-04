@@ -1,0 +1,52 @@
+Building BoringSSL in Windows:
+==================================
+See https://boringssl.googlesource.com/boringssl/+/HEAD/BUILDING.md
+
+Build commands:
+
+    mkdir build
+    cd build
+    cmake -GNinja ..
+    ninja
+
+I went the Microsoft Visual Studios 2015 route.
+Install Active State Perl, Ninja, Yasm, and Go, and cmake, and add them to your system PATH.
+Yasm and Ninja were just executables that I downloaded and placed in their own folder in C:\Program Files\.
+Make sure that cmake doesn't try to use other compilers it finds in your PATH on accident.
+Make sure there are NO SPACES in your filepath to where you cloned BoringSSL.
+I already added "C:\Program Files\yasm" to my path, so to tell CMAKE what assembler to use,
+create an environmental variable ASM_NASM and set it to yasm-1.3.0-win64.exe.
+
+Looks like I can point to the ssl library at C:\crypto\boringssl\build\ssl and the crypto library at C:\crypto\boringssl\build\crypto
+
+
+
+Compiling a program with Visual Studios
+==========================================
+I Created a simple standalone program called aes_test.cpp.
+I used it to test out using the AES blocks in the BorinsSSL library
+Open up a Visual Studios 2015 Developer Command Prompt. This won't work on a regular command prompt.
+cd to directory containing aes_test.cpp
+Compile it with the following command:
+
+    cl /EHsc /I C:\crypto\boringssl\include aes_test.cpp crypto.lib /link /LIBPATH:C:\crypto\boringssl\build\crypto /verbose:lib /NODEFAULTLIB:MSVCRTD
+
+References:
+    *Basic cl syntax: https://msdn.microsoft.com/en-us/library/610ecb4h.aspx
+    *Specify include dir: https://msdn.microsoft.com/en-us/library/73f9s62w.aspx
+    *Specify library dir (Linker option, not cl option!): https://msdn.microsoft.com/en-us/library/1xhzskbe.aspx
+    *Link Warning 4098 (verbose:lib option): http://stackoverflow.com/questions/3007312/resolving-lnk4098-defaultlib-msvcrt-conflicts-with
+    *Info on MVSC CRT (C runtime library): https://msdn.microsoft.com/en-us/library/abx4dbyh.aspx
+    *Warning C4577 "noexcept" - specify /EHsc option by suggestion from the compiler. See https://msdn.microsoft.com/en-us/library/1deeycx5.aspx
+    *Link Error 2019 Fix: Add in /NODEFAULTLIB:MSVCRTD linker option by suggestion from the compiler
+    *It appears that OpenSSL stores things in arrays in big-endian (printable) format.
+    See http://stackoverflow.com/a/9455607/1416379
+
+
+Create a testbench
+===================================
+I created a wrapper function for the AES block, so I can target it as the top-level function in Vivado HLS.
+
+To compile:
+
+    cl /EHsc /I C:\crypto\boringssl\include aes_testbench.cpp aes_256_wrapper.cpp crypto.lib /link /LIBPATH:C:\crypto\boringssl\build\crypto /verbose:lib /NODEFAULTLIB:MSVCRTD

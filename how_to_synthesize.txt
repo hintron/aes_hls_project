@@ -1,0 +1,58 @@
+How to synthesize AES in Vivado HLS
+========================================================
+
+On Windows: Make sure there are NO SPACES in the file path! Vivado can't handle spaces.
+
+Clone our special version of Boring SSL to a desired location on your computer.
+
+    git clone https://github.com/hintron/boring_ssl_hls
+
+Make sure you are on branch hls_project, not master.
+The rest of these steps assume that boring_ssl_hls was cloned to C:/boring_ssl_hls.
+
+Clone the other wrapper files to a desired location on your computer.
+
+    git clone https://github.com/hintron/aes_hls_project.git
+
+The rest of these steps assume that aes_hls_project was cloned to C:/aes_hls_project.
+
+==========================================================
+
+Create a new project in Vivado HLS.
+Specify the project name and location.
+Again: Make sure there are NO SPACES in the file path!
+Click Next >
+
+==========================================================
+
+Add these two files as source files:
+
+    C:/boring_ssl_hls/crypto/aes/aes.c
+    C:/aes_hls_project/aes_256_wrapper.cpp
+
+To specify the BoringSSL c headers and set compile-time macros, go to Project -> Project Settings -> Synthesis.
+Click on aes_256_wrapper.cpp, click Edit CFLAGS... and paste the following in:
+
+    -I C:/boring_ssl_hls/include
+
+Click on aes.c, click Edit CFLAGS... and paste the following in:
+
+    -I C:/boring_ssl_hls/include -DHLS_SYNTHESIS
+
+For the top-level function, select aes_256_wrapper.
+Click Next >
+
+==========================================================
+
+Continue to the testbench stage. Add the following file as a testbench:
+
+    C:/aes_hls_project/aes_testbench.cpp
+
+Click Next >
+
+==========================================================
+
+Specify the clock period to 10 (it should be the default).
+For the part number, select xc7z010clg400-1.
+
+Click Finish

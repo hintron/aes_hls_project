@@ -122,10 +122,10 @@ Though it synthesizes, it prevents it from reporting on the loop latency, since 
 know the number of iterations.
 See pg. 470 of Vivado HLS Guide for the set_directive_loop_tripcount
 
-
-
 I hosted the Boring SSL code that I modified here:
 https://github.com/hintron/boring_ssl_hls
 
+The testbench and aes wrapper files are stored here:
+https://bitbucket.org/kolob/hls_aes_project/
 
-TODO: Do a release build of BoringSSL? Pass -DCMAKE_BUILD_TYPE=Release to cmake
+The part number is xc7z010clg400-1.
