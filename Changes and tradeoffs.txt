@@ -1,0 +1,34 @@
+Mike's changes:
+Baseline: max interval 128; BRAM
+
+Change 1: Full partition Te0, Te1, Te2, Te3 placed in AES_set_encrypt_key: Overuse of LUT
+Change 2: Block partition of Te* by factor of 16: uses more resources, but no reduction in latency/interval
+Change 3: Pipeline 256 bytes rounds in AES_set_encrypt_key.  Te* partitioned: Only slight decrease in latency/interval
+Change 4: Fully partitioned rk in AES_set_encrypt_key: Didn't appear to do anything.  Undo this change
+Change 5: Fully partitioned key: Decreased latency/interval a bit.
+Change 6: Undo full partition of Te*: Significant reduction in resources, no change in latency/interval.  Keep
+Change 7: Assuming this is not fully unrolled, put a pipeline statement in AES_encrypt: increased latency/interval. Keep for now.
+NOTE: I did pipeline wrong.  It should be placed before the loop, not after.  It is also really only good for nested loops I think.
+Change 8:Moved the pipeline in change 7 correctly before the loop: back to change 6 numbers.  Remove this.
+Change 9: Placed pipeline at beginning of function in AES_set_encrypt_key:  Latency dropped a good amount, but LUT increased significantly. keep.
+Change 10: Placed pipeline at beginning of AES_encrypt: No difference whatsoever.  Fairly certain the loop here is already fully unrolled.  Don't keep
+Change 11: Fully partitioned 'in' in AES_encrypt: latency/interval dropped a few, so did resources a little.  keep
+Change 12: Fully partitioned 'out' in AES_encrypt: latency/interval dropped a few, but resources increased a little. keep.
+Change 13: Trying to partition Te* but this time in AES_encrypt with a factor of 2: Hmm.  This murdered resources and there is no latency/interval estimate.  Undo
+Change 14: Pipeline aes_256_wrapper_enc: No change. Don't keep
+Change 15: Remove pipeline in while in AES_set_encrypt_key: No change remove this pipeline.
+<--------------Current Changes--------------------->
+(See change 15 for performance and area values)
+Fully partition variable 'in' at beginning AES_encrypt
+Fully partition variable 'out' at beginning AES_encrypt
+Fully partition variable 'key' at beginning AES_set_encrypt_key
+Pipeline at beginning AES_set_encrypt_key
+<--------------Current Changes--------------------->
+Change 16: Full unroll by adding -DFULL_UNROLL in CFLAGS for aes.c : Latency gets down to 40, but LUT is overutilized at 181%.  Take a further look
+Change 17: Set pipeline at beginning of AES_encrypt with the full unroll flag: BRAMs skyrocketed.  Test partitioning Te* again. If that doesn't work, undo changes 17 and 16
+Change 18: Going back to the "Current Changes", fully partitioned rk in AES_set_encrypt_key.  48 latency, high LUT use
+Change 19: Changed partitioning of rk to 4.  High latency same with 6. 2 yields ?.
+Change 20: added flushing and II=4 on AP Pipeline in AES_set_encrypt_key.  48 Latency lowered resource use from 18
+Change 21: removed the flushing. Latency increased slightly, resource use changed a little some went up some went down. re-enable flushing
+Change 22: re-added flushing.  Changed II=2.  No change over II=4.  Tried II=8 no change over II=4
+Change 23: removed II=4.  FF use is higher.

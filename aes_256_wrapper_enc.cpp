@@ -13,6 +13,7 @@
  */
 int aes_256_wrapper_enc(const uint8_t in[16], uint8_t out[16], const uint8_t key[32]) {
 
+
     // TODO: Check to make sure incoming data is good
 
     AES_KEY aes_key_schedule;
